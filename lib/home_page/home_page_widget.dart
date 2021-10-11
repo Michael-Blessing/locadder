@@ -135,7 +135,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                   ),
                   Row(
                     mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(0, 5, 0, 0),
@@ -166,7 +167,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(10, 5, 0, 0),
+                        padding: EdgeInsetsDirectional.fromSTEB(0, 5, 0, 0),
                         child: FFButtonWidget(
                           onPressed: () {
                             print('Button pressed ...');
@@ -174,7 +175,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                           text: '',
                           icon: FaIcon(
                             FontAwesomeIcons.microphone,
-                            size: 20,
+                            size: 17,
                           ),
                           options: FFButtonOptions(
                             width: 40,
@@ -194,7 +195,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(10, 5, 0, 0),
+                        padding: EdgeInsetsDirectional.fromSTEB(0, 5, 0, 0),
                         child: FFButtonWidget(
                           onPressed: () {
                             print('Button pressed ...');
@@ -202,7 +203,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                           text: '',
                           icon: FaIcon(
                             FontAwesomeIcons.video,
-                            size: 20,
+                            size: 16,
                           ),
                           options: FFButtonOptions(
                             width: 40,
@@ -265,7 +266,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(1, 0, 1, 0),
+                        padding: EdgeInsetsDirectional.fromSTEB(20, 0, 1, 0),
                         child: Text(
                           'Lat',
                           style: FlutterFlowTheme.bodyText1.override(
@@ -275,7 +276,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       ),
                       Expanded(
                         child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(1, 10, 1, 10),
+                          padding:
+                              EdgeInsetsDirectional.fromSTEB(1, 10, 10, 10),
                           child: TextFormField(
                             controller: textController3,
                             obscureText: false,
@@ -322,7 +324,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       ),
                       Expanded(
                         child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(1, 10, 1, 10),
+                          padding:
+                              EdgeInsetsDirectional.fromSTEB(1, 10, 20, 10),
                           child: TextFormField(
                             controller: textController4,
                             obscureText: false,
