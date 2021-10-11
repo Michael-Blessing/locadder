@@ -1,6 +1,7 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import '../Camera.dart';
 
 class FFButtonOptions {
   const FFButtonOptions({
@@ -81,7 +82,7 @@ class FFButtonWidget extends StatelessWidget {
         width: options.width,
         child: RaisedButton.icon(
           icon: Padding(
-            padding: options.iconPadding ?? EdgeInsets.zero,
+            padding: EdgeInsets.zero,
             child: icon ??
                 FaIcon(
                   iconData,
@@ -110,7 +111,9 @@ class FFButtonWidget extends StatelessWidget {
       height: options.height,
       width: options.width,
       child: RaisedButton(
-        onPressed: onPressed,
+        onPressed: () {
+          MaterialPageRoute(builder: (context) => TakePictureScreen());
+        },
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(options.borderRadius ?? 28),
           side: options.borderSide ?? BorderSide.none,
