@@ -1,7 +1,6 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import '../Photo.dart';
 
 class FFButtonOptions {
   const FFButtonOptions({
@@ -112,7 +111,7 @@ class FFButtonWidget extends StatelessWidget {
       width: options.width,
       child: RaisedButton(
         onPressed: () {
-          MaterialPageRoute(builder: (context) => TakePictureScreen());
+          //MaterialPageRoute(builder: (context) => takePhoto());
         },
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(options.borderRadius ?? 28),
