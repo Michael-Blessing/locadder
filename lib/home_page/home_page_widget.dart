@@ -141,7 +141,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 5, 0, 0),
+                        padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
                         child: FFButtonWidget(
                           onPressed: () {
                             MaterialPageRoute(
@@ -150,11 +150,11 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                           text: '',
                           icon: Icon(
                             Icons.add_a_photo,
-                            size: 16,
+                            size: 14,
                           ),
                           options: FFButtonOptions(
-                            width: 40,
-                            height: 40,
+                            width: 50,
+                            height: 50,
                             color: Color(0xFFDC0C0C),
                             textStyle: FlutterFlowTheme.subtitle2.override(
                               fontFamily: 'Poppins',
@@ -179,11 +179,11 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                           text: '',
                           icon: FaIcon(
                             FontAwesomeIcons.microphone,
-                            size: 17,
+                            size: 16,
                           ),
                           options: FFButtonOptions(
-                            width: 40,
-                            height: 40,
+                            width: 50,
+                            height: 50,
                             color: Color(0xFFDC0C0C),
                             textStyle: FlutterFlowTheme.subtitle2.override(
                               fontFamily: 'Poppins',
@@ -208,11 +208,11 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                           text: '',
                           icon: FaIcon(
                             FontAwesomeIcons.video,
-                            size: 16,
+                            size: 12,
                           ),
                           options: FFButtonOptions(
-                            width: 40,
-                            height: 40,
+                            width: 50,
+                            height: 50,
                             color: Color(0xFFDC0C0C),
                             textStyle: FlutterFlowTheme.subtitle2.override(
                               fontFamily: 'Poppins',
@@ -369,7 +369,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                     ],
                   ),
                   Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0, 390, 0, 10),
+                    padding: EdgeInsetsDirectional.fromSTEB(0, 300, 0, 10),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
