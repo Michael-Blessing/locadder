@@ -1,3 +1,5 @@
+import 'package:locadder/Photo.dart';
+
 import '../flutter_flow/flutter_flow_theme.dart';
 import '../flutter_flow/flutter_flow_util.dart';
 import '../flutter_flow/flutter_flow_widgets.dart';
@@ -142,7 +144,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         padding: EdgeInsetsDirectional.fromSTEB(0, 5, 0, 0),
                         child: FFButtonWidget(
                           onPressed: () {
-                            print('Button pressed ...');
+                            MaterialPageRoute(
+                                builder: (context) => takePhoto());
                           },
                           text: '',
                           icon: Icon(
@@ -170,7 +173,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         padding: EdgeInsetsDirectional.fromSTEB(0, 5, 0, 0),
                         child: FFButtonWidget(
                           onPressed: () {
-                            print('Button pressed ...');
+                            MaterialPageRoute(
+                                builder: (context) => takePhoto());
                           },
                           text: '',
                           icon: FaIcon(
@@ -198,7 +202,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         padding: EdgeInsetsDirectional.fromSTEB(0, 5, 0, 0),
                         child: FFButtonWidget(
                           onPressed: () {
-                            print('Button pressed ...');
+                            MaterialPageRoute(
+                                builder: (context) => takePhoto());
                           },
                           text: '',
                           icon: FaIcon(
