@@ -15,7 +15,6 @@ class _takePhotoState extends State<takePhoto> {
   }
 
   void initState() {
-    super.initState;
     WidgetsFlutterBinding.ensureInitialized();
   }
 
@@ -27,7 +26,7 @@ class _takePhotoState extends State<takePhoto> {
       theme: ThemeData.dark(),
       home: TakePictureScreen(
         // Pass the appropriate camera to the TakePictureScreen widget.
-        camera: cameras,
+        camera: firstCamera,
       ),
     );
   }
