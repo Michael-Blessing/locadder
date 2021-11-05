@@ -31,14 +31,7 @@ class _takePhotoState extends State<takePhoto> {
     );
   }
 }
-// ignore: non_constant_identifier_names
 
-// Ensure that plugin services are initialized so that `availableCameras()`
-// can be called before `runApp()`
-
-// Obtain a list of the available cameras on the device.
-
-// A screen that allows users to take a picture using a given camera.
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({
     Key key,

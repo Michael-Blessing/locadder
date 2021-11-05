@@ -144,8 +144,10 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
                         child: FFButtonWidget(
                           onPressed: () {
-                            MaterialPageRoute(
-                                builder: (context) => takePhoto());
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => takePhoto()));
                           },
                           text: '',
                           icon: Icon(
@@ -173,8 +175,10 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
                         child: FFButtonWidget(
                           onPressed: () {
-                            MaterialPageRoute(
-                                builder: (context) => takePhoto());
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => takePhoto()));
                           },
                           text: '',
                           icon: FaIcon(
@@ -202,8 +206,10 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
                         child: FFButtonWidget(
                           onPressed: () {
-                            MaterialPageRoute(
-                                builder: (context) => takePhoto());
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => takePhoto()));
                           },
                           text: '',
                           icon: FaIcon(
