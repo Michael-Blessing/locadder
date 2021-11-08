@@ -8,31 +8,30 @@ cameras() async {
   return availableCameras();
 }
 
-class takePhoto extends StatelessElement {
+Widget takePhoto() {
   // Ensure that plugin services are initialized so that `availableCameras()`
   // can be called before `runApp()`
 
   // Obtain a list of the available cameras on the device.
   // Get a specific camera from the list of available cameras.
   // final firstCamera = cameras.first
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: availableCameras(),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        dynamic firstCamera = snapshot.data.first;
-        if (!snapshot.hasData) {
-          SizedBox.shrink();
-        }
-        return MaterialApp(
-          theme: ThemeData.dark(),
-          home: TakePictureScreen(
-            // Pass the appropriate camera to the TakePictureScreen widget.
-            camera: firstCamera,
-          ),
-        );
-      },
-    );
-  }
+
+  return FutureBuilder(
+    future: availableCameras(),
+    builder: (BuildContext context, AsyncSnapshot snapshot) {
+      dynamic firstCamera = snapshot.data.first;
+      if (!snapshot.hasData) {
+        SizedBox.shrink();
+      }
+      return MaterialApp(
+        theme: ThemeData.dark(),
+        home: TakePictureScreen(
+          // Pass the appropriate camera to the TakePictureScreen widget.
+          camera: firstCamera,
+        ),
+      );
+    },
+  );
 }
 
 // A screen that allows users to take a picture using a given camera.
