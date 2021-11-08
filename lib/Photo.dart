@@ -3,31 +3,38 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
+dynamic getCamera() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  return availableCameras();
+}
+
 class takePhoto extends StatefulWidget {
-  const takePhoto({Key key}) : super(key: key);
+  const takePhoto({Key key, dynamic cameras}) : super(key: key);
 
   _takePhotoState createState() => _takePhotoState();
 }
 
 class _takePhotoState extends State<takePhoto> {
-  dynamic getCamera() async {
-    return availableCameras();
-  }
-
-  void initState() {
-    WidgetsFlutterBinding.ensureInitialized();
-  }
-
   @override
   Widget build(BuildContext context) {
-    dynamic cameras = getCamera();
-    dynamic firstCamera = cameras.first;
-    return MaterialApp(
-      theme: ThemeData.dark(),
-      home: TakePictureScreen(
-        // Pass the appropriate camera to the TakePictureScreen widget.
-        camera: firstCamera,
-      ),
+    return FutureBuilder(
+      future: getCamera(),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.hasData) {
+          MaterialApp(
+            theme: ThemeData.dark(),
+            home: TakePictureScreen(
+              camera: snapshot.data,
+            ),
+          );
+        } else {
+          const sizedBox = SizedBox(
+            child: CircularProgressIndicator(),
+            width: 60,
+            height: 60,
+          );
+        }
+      },
     );
   }
 }
