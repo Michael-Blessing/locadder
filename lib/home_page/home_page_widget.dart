@@ -1,5 +1,5 @@
 import 'package:locadder/Photo.dart';
-
+import 'package:locadder/Video.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
 import '../flutter_flow/flutter_flow_util.dart';
 import '../flutter_flow/flutter_flow_widgets.dart';
@@ -209,7 +209,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => takePhoto()));
+                                    builder: (context) => VideoApp()));
                           },
                           text: '',
                           icon: FaIcon(
