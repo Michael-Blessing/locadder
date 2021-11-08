@@ -5,6 +5,7 @@ import 'package:locadder/home_page/home_page_widget.dart';
 import 'flutter_flow/flutter_flow_theme.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
