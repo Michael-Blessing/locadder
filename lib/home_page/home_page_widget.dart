@@ -1,5 +1,7 @@
 import 'package:locadder/Photo.dart';
 import 'package:locadder/Video.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
 import '../flutter_flow/flutter_flow_util.dart';
 import '../flutter_flow/flutter_flow_widgets.dart';
@@ -416,9 +418,15 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                           loading: _loadingButton4,
                         ),
                         FFButtonWidget(
-                          onPressed: () {
-                            print('Button pressed ...');
-                          },
+                          onPressed: () => FirebaseFirestore.instance
+                              .collection('Locations')
+                              .add(
+                            {
+                              'timestamp': Timestamp.fromDate(
+                                DateTime.now(),
+                              ),
+                            },
+                          ),
                           text: 'Create',
                           options: FFButtonOptions(
                             width: 130,
@@ -436,7 +444,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                             borderRadius: 12,
                           ),
                           loading: _loadingButton5,
-                        )
+                        ),
                       ],
                     ),
                   )
