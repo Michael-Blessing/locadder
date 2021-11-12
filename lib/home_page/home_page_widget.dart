@@ -7,6 +7,7 @@ import '../flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:locadder/Video.dart';
 
 class HomePageWidget extends StatefulWidget {
   HomePageWidget({Key key}) : super(key: key);
@@ -144,12 +145,21 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
                         child: FFButtonWidget(
-                          onPressed: () {
+                          onPressed: () => FirebaseFirestore.instance
+                              .collection('testing5')
+                              .add(
+                            {
+                              'timestamp': Timestamp.fromDate(
+                                DateTime.now(),
+                              ),
+                            },
+                          ),
+                          /* () {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => takePhoto()));
-                          },
+                          },*/
                           text: '',
                           icon: Icon(
                             Icons.add_a_photo,
