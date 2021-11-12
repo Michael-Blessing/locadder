@@ -1,5 +1,4 @@
 import 'package:locadder/Photo.dart';
-import 'package:locadder/Video.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
