@@ -25,6 +25,9 @@ class _VideoAppState extends State<VideoApp> {
     return MaterialApp(
       title: 'Video Demo',
       home: Scaffold(
+        appBar: AppBar(
+          title: Text('Take a Video'),
+        ),
         body: Center(
           child: _controller.value.isInitialized
               ? AspectRatio(
