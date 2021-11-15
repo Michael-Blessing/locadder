@@ -325,7 +325,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                   Padding(
                     padding: EdgeInsetsDirectional.fromSTEB(10, 5, 10, 0),
                     child: FFButtonWidget(
-                      onPressed: search(),
+                      onPressed: () => search(),
                       text: 'Search',
                       options: FFButtonOptions(
                         width: 130,
