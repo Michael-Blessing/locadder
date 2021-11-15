@@ -144,12 +144,13 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
                         child: FFButtonWidget(
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => takePhoto()));
-                          },
+                          onPressed: () => FirebaseFirestore.instance
+                              .collection('testing2')
+                              .add({
+                            'timestamp': Timestamp.fromDate(
+                              DateTime.now(),
+                            )
+                          }),
                           text: '',
                           icon: Icon(
                             Icons.add_a_photo,
