@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:locadder/Video.dart';
+import 'package:geocoder/geocoder.dart';
+import 'package:geocoder/services/base.dart';
 
 class HomePageWidget extends StatefulWidget {
   HomePageWidget({Key key}) : super(key: key);
@@ -28,14 +30,41 @@ class _HomePageWidgetState extends State<HomePageWidget> {
   bool _loadingButton5 = false;
   final formKey = GlobalKey<FormState>();
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  List<Address> results = [];
 
   @override
   void initState() {
     super.initState();
-    textController1 = TextEditingController(text: 'Generic City');
+    textController1 = TextEditingController();
     textController2 = TextEditingController();
-    textController3 = TextEditingController();
-    textController4 = TextEditingController();
+  }
+
+  Widget getLong() {
+    if (this.results.isNotEmpty) {
+      var long = this.results.first.coordinates.longitude;
+      return Text(long.toString());
+    } else {
+      return Text('bald');
+    }
+  }
+
+  Widget getLat() {
+    if (this.results.isNotEmpty) {
+      var long = this.results.first.coordinates.latitude;
+      return Text(long.toString());
+    } else {
+      return Text('bald');
+    }
+  }
+
+  search() async {
+    try {
+      results =
+          await Geocoder.local.findAddressesFromQuery(textController1.text);
+      this.setState(() {
+        this.results = results;
+      });
+    } catch (e) {}
   }
 
   @override
@@ -293,6 +322,29 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       ),
                     ),
                   ),
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(10, 5, 10, 0),
+                    child: FFButtonWidget(
+                      onPressed: search(),
+                      text: 'Search',
+                      options: FFButtonOptions(
+                        width: 130,
+                        height: 40,
+                        color: Color(0xFF0305FE),
+                        textStyle: GoogleFonts.getFont(
+                          'Raleway',
+                          color: Colors.white,
+                          fontStyle: FontStyle.normal,
+                        ),
+                        borderSide: BorderSide(
+                          color: Colors.transparent,
+                          width: 1,
+                        ),
+                        borderRadius: 12,
+                      ),
+                      loading: _loadingButton4,
+                    ),
+                  ),
                   Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
@@ -307,42 +359,9 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       ),
                       Expanded(
                         child: Padding(
-                          padding:
-                              EdgeInsetsDirectional.fromSTEB(1, 10, 10, 10),
-                          child: TextFormField(
-                            controller: textController3,
-                            obscureText: false,
-                            decoration: InputDecoration(
-                              hintText: 'Latitude',
-                              hintStyle: FlutterFlowTheme.bodyText1.override(
-                                fontFamily: 'Poppins',
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Color(0xFF8F8F8F),
-                                  width: 1,
-                                ),
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(4.0),
-                                  topRight: Radius.circular(4.0),
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Color(0xFF8F8F8F),
-                                  width: 1,
-                                ),
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(4.0),
-                                  topRight: Radius.circular(4.0),
-                                ),
-                              ),
-                            ),
-                            style: FlutterFlowTheme.bodyText1.override(
-                              fontFamily: 'Poppins',
-                            ),
-                          ),
-                        ),
+                            padding:
+                                EdgeInsetsDirectional.fromSTEB(1, 10, 10, 10),
+                            child: getLat()),
                       ),
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(1, 0, 1, 0),
@@ -355,42 +374,9 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       ),
                       Expanded(
                         child: Padding(
-                          padding:
-                              EdgeInsetsDirectional.fromSTEB(1, 10, 20, 10),
-                          child: TextFormField(
-                            controller: textController4,
-                            obscureText: false,
-                            decoration: InputDecoration(
-                              hintText: 'Longitude',
-                              hintStyle: FlutterFlowTheme.bodyText1.override(
-                                fontFamily: 'Poppins',
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Color(0xFF8F8F8F),
-                                  width: 1,
-                                ),
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(4.0),
-                                  topRight: Radius.circular(4.0),
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Color(0xFF8F8F8F),
-                                  width: 1,
-                                ),
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(4.0),
-                                  topRight: Radius.circular(4.0),
-                                ),
-                              ),
-                            ),
-                            style: FlutterFlowTheme.bodyText1.override(
-                              fontFamily: 'Poppins',
-                            ),
-                          ),
-                        ),
+                            padding:
+                                EdgeInsetsDirectional.fromSTEB(1, 10, 20, 10),
+                            child: getLong()),
                       )
                     ],
                   ),

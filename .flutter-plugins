@@ -33,6 +33,7 @@ cloud_firestore_web=C:\\Users\\User\\Documents\\flutter\\.pub-cache\\hosted\\pub
 firebase_core=C:\\Users\\User\\Documents\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\firebase_core-1.10.0\\
 firebase_core_web=C:\\Users\\User\\Documents\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\firebase_core_web-1.2.0\\
 flutter_plugin_android_lifecycle=C:\\Users\\User\\Documents\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\flutter_plugin_android_lifecycle-2.0.4\\
+geocoder=C:\\Users\\User\\Documents\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\geocoder-0.2.1\\
 geolocator=C:\\Users\\User\\Documents\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\geolocator-7.6.2\\
 geolocator_android=C:\\Users\\User\\Documents\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\geolocator_android-1.0.2\\
 geolocator_apple=C:\\Users\\User\\Documents\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\geolocator_apple-1.2.2\\

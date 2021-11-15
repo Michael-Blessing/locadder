@@ -4,37 +4,33 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
-cameras() async {
+getCameras() async {
   return availableCameras();
 }
 
 Widget takePhoto() {
-  // Ensure that plugin services are initialized so that `availableCameras()`
-  // can be called before `runApp()`
-
-  // Obtain a list of the available cameras on the device.
-  // Get a specific camera from the list of available cameras.
-  // final firstCamera = cameras.first
-
-  return FutureBuilder(
-    future: availableCameras(),
-    builder: (BuildContext context, AsyncSnapshot snapshot) {
-      dynamic firstCamera = snapshot.data;
-      if (!snapshot.hasData) {
-        SizedBox.shrink();
-      }
-      return MaterialApp(
-        theme: ThemeData.dark(),
-        home: TakePictureScreen(
-          // Pass the appropriate camera to the TakePictureScreen widget.
-          camera: firstCamera[0],
-        ),
-      );
-    },
+  return Scaffold(
+    appBar: AppBar(
+      title: Text('Take a photo'),
+    ),
+    body: FutureBuilder(
+      future: getCameras(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (!snapshot.hasData) {
+          SizedBox.shrink();
+        }
+        List<CameraDescription> cameras = snapshot.data;
+        return MaterialApp(
+          theme: ThemeData.dark(),
+          home: TakePictureScreen(
+            camera: cameras[0],
+          ),
+        );
+      },
+    ),
   );
 }
 
-// A screen that allows users to take a picture using a given camera.
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({
     Key key,
@@ -54,8 +50,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   @override
   void initState() {
     super.initState();
-    // To display the current output from the Camera,
-    // create a CameraController.
+
     _controller = CameraController(
       // Get a specific camera from the list of available cameras.
       widget.camera,
