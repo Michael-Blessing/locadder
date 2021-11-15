@@ -19,7 +19,7 @@ Widget takePhoto() {
   return FutureBuilder(
     future: availableCameras(),
     builder: (BuildContext context, AsyncSnapshot snapshot) {
-      dynamic firstCamera = snapshot.data.first;
+      dynamic firstCamera = snapshot.data;
       if (!snapshot.hasData) {
         SizedBox.shrink();
       }
@@ -27,7 +27,7 @@ Widget takePhoto() {
         theme: ThemeData.dark(),
         home: TakePictureScreen(
           // Pass the appropriate camera to the TakePictureScreen widget.
-          camera: firstCamera,
+          camera: firstCamera[0],
         ),
       );
     },

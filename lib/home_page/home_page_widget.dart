@@ -7,6 +7,7 @@ import '../flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:locadder/Video.dart';
 
 class HomePageWidget extends StatefulWidget {
   HomePageWidget({Key key}) : super(key: key);
@@ -145,12 +146,29 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
                         child: FFButtonWidget(
                           onPressed: () => FirebaseFirestore.instance
+<<<<<<< HEAD
                               .collection('testing2')
                               .add({
                             'timestamp': Timestamp.fromDate(
                               DateTime.now(),
                             )
                           }),
+=======
+                              .collection('testing5')
+                              .add(
+                            {
+                              'timestamp': Timestamp.fromDate(
+                                DateTime.now(),
+                              ),
+                            },
+                          ),
+                          /* () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => takePhoto()));
+                          },*/
+>>>>>>> 3d6fef9d5781c2e5da1fe0d34e8578426fc939f2
                           text: '',
                           icon: Icon(
                             Icons.add_a_photo,
@@ -211,7 +229,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => takePhoto()));
+                                    builder: (context) => VideoApp()));
                           },
                           text: '',
                           icon: FaIcon(
