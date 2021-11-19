@@ -5,7 +5,13 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
 getCameras() async {
-  return availableCameras();
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Obtain a list of the available cameras on the device.
+  List<CameraDescription> cameras = await availableCameras();
+
+  // Get a specific camera from the list of available cameras.
+  return cameras.first;
 }
 
 Widget takePhoto() {
@@ -19,11 +25,10 @@ Widget takePhoto() {
         if (!snapshot.hasData) {
           SizedBox.shrink();
         }
-        List<CameraDescription> cameras = snapshot.data;
         return MaterialApp(
           theme: ThemeData.dark(),
           home: TakePictureScreen(
-            camera: cameras[0],
+            camera: snapshot.data,
           ),
         );
       },
