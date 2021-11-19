@@ -175,14 +175,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
                         child: FFButtonWidget(
                           onPressed: () => FirebaseFirestore.instance
-<<<<<<< HEAD
-                              .collection('testing2')
-                              .add({
-                            'timestamp': Timestamp.fromDate(
-                              DateTime.now(),
-                            )
-                          }),
-=======
                               .collection('testing5')
                               .add(
                             {
@@ -197,7 +189,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                 MaterialPageRoute(
                                     builder: (context) => takePhoto()));
                           },*/
->>>>>>> 3d6fef9d5781c2e5da1fe0d34e8578426fc939f2
                           text: '',
                           icon: Icon(
                             Icons.add_a_photo,

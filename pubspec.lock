@@ -213,7 +213,6 @@ packages:
       name: flutter_plugin_android_lifecycle
       url: "https://pub.dartlang.org"
     source: hosted
-<<<<<<< HEAD
     version: "2.0.3"
   flutter_sound:
     dependency: "direct main"
@@ -236,9 +235,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "8.4.2"
-=======
-    version: "2.0.4"
->>>>>>> 3d6fef9d5781c2e5da1fe0d34e8578426fc939f2
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -472,8 +468,7 @@ packages:
       name: process
       url: "https://pub.dartlang.org"
     source: hosted
-<<<<<<< HEAD
-    version: "4.2.3"
+    version: "4.2.4"
   provider:
     dependency: transitive
     description:
@@ -481,17 +476,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "6.0.1"
-=======
-    version: "4.2.4"
->>>>>>> 3d6fef9d5781c2e5da1fe0d34e8578426fc939f2
   quiver:
     dependency: transitive
     description:
       name: quiver
       url: "https://pub.dartlang.org"
     source: hosted
-<<<<<<< HEAD
-    version: "3.0.1"
+    version: "3.0.1+1"
   recase:
     dependency: transitive
     description:
@@ -499,9 +490,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.0"
-=======
-    version: "3.0.1+1"
->>>>>>> 3d6fef9d5781c2e5da1fe0d34e8578426fc939f2
   rxdart:
     dependency: transitive
     description:
@@ -669,7 +657,7 @@ packages:
     source: hosted
     version: "4.2.0"
   video_player_web:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: video_player_web
       url: "https://pub.dartlang.org"
