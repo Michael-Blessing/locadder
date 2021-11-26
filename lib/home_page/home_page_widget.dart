@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:locadder/Photo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -8,11 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:locadder/Video.dart';
-import 'package:geocoder/geocoder.dart';
-import 'package:geocoder/services/base.dart';
+import 'package:geocode/geocode.dart';
 
 class HomePageWidget extends StatefulWidget {
-  HomePageWidget({Key key}) : super(key: key);
+  final CameraDescription camera;
+  HomePageWidget(CameraDescription firstCamera, {Key key, this.camera})
+      : super(key: key);
 
   @override
   _HomePageWidgetState createState() => _HomePageWidgetState();
@@ -30,7 +32,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
   bool _loadingButton5 = false;
   final formKey = GlobalKey<FormState>();
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  List<Address> results = [];
+  GeoCode geoCode = GeoCode();
+  Coordinates coordinates;
 
   @override
   void initState() {
@@ -40,31 +43,33 @@ class _HomePageWidgetState extends State<HomePageWidget> {
   }
 
   Widget getLong() {
-    if (this.results.isNotEmpty) {
-      var long = this.results.first.coordinates.longitude;
+    if (this.coordinates != null) {
+      var long = this.coordinates.longitude;
       return Text(long.toString());
     } else {
-      return Text('bald');
+      return Text('');
     }
   }
 
   Widget getLat() {
-    if (this.results.isNotEmpty) {
-      var long = this.results.first.coordinates.latitude;
+    if (this.coordinates != null) {
+      var long = this.coordinates.latitude;
       return Text(long.toString());
     } else {
-      return Text('bald');
+      return Text('');
     }
   }
 
   search() async {
     try {
-      results =
-          await Geocoder.local.findAddressesFromQuery(textController1.text);
+      coordinates =
+          await geoCode.forwardGeocoding(address: textController1.text);
       this.setState(() {
-        this.results = results;
+        this.coordinates = coordinates;
       });
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -174,7 +179,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
                         child: FFButtonWidget(
-                          onPressed: () => FirebaseFirestore.instance
+                          onPressed: /*() => FirebaseFirestore.instance
                               .collection('testing5')
                               .add(
                             {
@@ -182,13 +187,15 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                 DateTime.now(),
                               ),
                             },
-                          ),
-                          /* () {
+                          ),*/
+                              () {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => takePhoto()));
-                          },*/
+                                    builder: (context) => TakePictureScreen(
+                                          camera: widget.camera,
+                                        )));
+                          },
                           text: '',
                           icon: Icon(
                             Icons.add_a_photo,
@@ -214,12 +221,13 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
                         child: FFButtonWidget(
-                          onPressed: () {
+                          onPressed: /*() {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => takePhoto()));
-                          },
+                          },*/
+                              () {},
                           text: '',
                           icon: FaIcon(
                             FontAwesomeIcons.microphone,
@@ -372,7 +380,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                     ],
                   ),
                   Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0, 300, 0, 10),
+                    padding: EdgeInsetsDirectional.fromSTEB(0, 220, 0, 10),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -387,7 +395,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                   type: PageTransitionType.topToBottom,
                                   duration: Duration(milliseconds: 300),
                                   reverseDuration: Duration(milliseconds: 300),
-                                  child: HomePageWidget(),
+                                  child: HomePageWidget(widget.camera),
                                 ),
                               );
                             } finally {

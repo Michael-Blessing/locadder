@@ -4,38 +4,6 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
-getCameras() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Obtain a list of the available cameras on the device.
-  List<CameraDescription> cameras = await availableCameras();
-
-  // Get a specific camera from the list of available cameras.
-  return cameras.first;
-}
-
-Widget takePhoto() {
-  return Scaffold(
-    appBar: AppBar(
-      title: Text('Take a photo'),
-    ),
-    body: FutureBuilder(
-      future: getCameras(),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (!snapshot.hasData) {
-          SizedBox.shrink();
-        }
-        return MaterialApp(
-          theme: ThemeData.dark(),
-          home: TakePictureScreen(
-            camera: snapshot.data,
-          ),
-        );
-      },
-    ),
-  );
-}
-
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({
     Key key,
