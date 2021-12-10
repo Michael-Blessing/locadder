@@ -214,12 +214,13 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
                         child: FFButtonWidget(
-                          onPressed: () {
+                          onPressed: /*() {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => takePhoto()));
-                          },
+                          },*/
+                              () {},
                           text: '',
                           icon: FaIcon(
                             FontAwesomeIcons.microphone,

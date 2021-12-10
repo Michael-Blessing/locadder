@@ -4,33 +4,6 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
-getCameras() async {
-  return availableCameras();
-}
-
-Widget takePhoto() {
-  return Scaffold(
-    appBar: AppBar(
-      title: Text('Take a photo'),
-    ),
-    body: FutureBuilder(
-      future: getCameras(),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (!snapshot.hasData) {
-          SizedBox.shrink();
-        }
-        List<CameraDescription> cameras = snapshot.data;
-        return MaterialApp(
-          theme: ThemeData.dark(),
-          home: TakePictureScreen(
-            camera: cameras[0],
-          ),
-        );
-      },
-    ),
-  );
-}
-
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({
     Key key,
