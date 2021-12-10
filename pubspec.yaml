@@ -47,7 +47,9 @@ dependencies:
   geocode: ^1.0.1
   geolocator: ^7.7.1
   geolocator_web: ^2.0.6
- 
+  path_provider:
+  firebase_storage: ^10.2.0
+
 
 dev_dependencies:
 

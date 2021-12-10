@@ -1,8 +1,26 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:firebase_core/firebase_core.dart' as firebase_core;
+
+class Storage {
+  final firebase_storage.FirebaseStorage storage =
+      firebase_storage.FirebaseStorage.instance;
+
+  Future<void> uploadFile(String filePath, String fileName) async {
+    File file = File(filePath);
+
+    try {
+      await firebase_storage.FirebaseStorage.instance
+          .ref('uploads/file-to-upload.png')
+          .putFile(file);
+    } on firebase_core.FirebaseException catch (e) {
+      // e.g, e.code == 'canceled'
+    }
+  }
+}
 
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({
@@ -44,6 +62,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final Storage storage = Storage();
     return Scaffold(
       appBar: AppBar(title: const Text('Take a picture')),
       // You must wait until the controller is initialized before displaying the
@@ -73,7 +92,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             // Attempt to take a picture and get the file `image`
             // where it was saved.
             final image = await _controller.takePicture();
-
+            storage.uploadFile(image.path, image.name);
             // If the picture was taken, display it on a new screen.
             await Navigator.of(context).push(
               MaterialPageRoute(
