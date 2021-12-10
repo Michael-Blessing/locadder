@@ -1,6 +1,8 @@
+/*
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:timeago/timeago.dart';
 import '../flutter_flow/flutter_flow_icon_button.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
 import '../flutter_flow/flutter_flow_util.dart';
@@ -16,6 +18,7 @@ class AudioWidget extends StatefulWidget {
 }
 
 class _AudioWidgetState extends State<AudioWidget> {
+  FlutterSound flutterSound = new FlutterSound();
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -67,7 +70,19 @@ class _AudioWidgetState extends State<AudioWidget> {
                               size: 30,
                             ),
                             onPressed: () {
-                              print('IconButton pressed ...');
+                              String path = await flutterSound.startPlayer(null);
+                              print('startPlayer: $path');
+
+                              _playerSubscription = flutterSound.onPlayerStateChanged.listen((e) {
+                                if (e != null) {
+                                  DateTime date = new DateTime.fromMillisecondsSinceEpoch(e.currentPosition.toInt());
+                                  String txt = DateFormat('mm:ss:SS', 'en_US').format(date);
+                                  this.setState((){
+                                    this._isPlaying = true;
+                                    this._playerTxt = txt.substring(0, 8);
+                                  });
+                                }
+                              });
                             },
                           ),
                         ),
@@ -106,7 +121,18 @@ class _AudioWidgetState extends State<AudioWidget> {
                               size: 30,
                             ),
                             onPressed: () {
-                              print('IconButton pressed ...');
+                              String path = await flutterSound.startRecorder(null);
+                              print('startPlayer: $path');
+                              _recorderSubscription = flutterSound.onRecorderStateChanged.listen((e) {
+                                if (e != null) {
+                                  DateTime date = new DateTime.fromMillisecondsSinceEpoch(e.currentPosition.toInt());
+                                  String txt = DateFormat('mm:ss:SS', 'en_US').format(date);
+                                  this.setState((){
+                                    this._isRecording = true;
+                                    this._recorderTxt = txt.substring(0, 8);
+                                  });
+                                }
+                              });
                             },
                           ),
                         ),
@@ -123,7 +149,13 @@ class _AudioWidgetState extends State<AudioWidget> {
                               size: 30,
                             ),
                             onPressed: () {
-                              print('IconButton pressed ...');
+                              String result = await flutterSound.stopRecorder();
+                              print('stopRecorder: $result');
+
+                              if (_recorderSubscription != null) {
+                                _recorderSubscription.cancel();
+                                _recorderSubscription = null:
+                              }
                             },
                           ),
                         )
@@ -138,4 +170,4 @@ class _AudioWidgetState extends State<AudioWidget> {
       ),
     );
   }
-}
+}*/
