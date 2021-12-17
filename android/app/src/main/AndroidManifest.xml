@@ -2,6 +2,9 @@
     package="com.flutterflow.locadder"
     xmlns:tools="http://schemas.android.com/tools">
    <uses-permission android:name="android.permission.INTERNET"/>
+   <uses-permission android:name="android.permission.RECORD_Audio"/>
+   <uses-permission android:namme="android.permission.WRITE_EXTERNAL_STORAGE"/>
+  
    <application
         android:label="locadder"
         tools:replace="android:label"
