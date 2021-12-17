@@ -1,3 +1,5 @@
+import 'package:camera_platform_interface/src/types/camera_description.dart';
+import 'package:geocode/geocode.dart';
 import 'package:locadder/Photo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -8,11 +10,11 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:locadder/Video.dart';
-import 'package:geocoder/geocoder.dart';
-import 'package:geocoder/services/base.dart';
+//import 'package:geocoder/geocoder.dart';
+//import 'package:geocoder/services/base.dart';
 
 class HomePageWidget extends StatefulWidget {
-  HomePageWidget({Key key}) : super(key: key);
+  HomePageWidget(CameraDescription firstCamera, {Key key}) : super(key: key);
 
   @override
   _HomePageWidgetState createState() => _HomePageWidgetState();
@@ -41,8 +43,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
 
   Widget getLong() {
     if (this.results.isNotEmpty) {
-      var long = this.results.first.coordinates.longitude;
-      return Text(long.toString());
+      //var long = this.results.first.coordinates.longitude;
+      //return Text(long.toString());
     } else {
       return Text('bald');
     }
@@ -50,8 +52,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
 
   Widget getLat() {
     if (this.results.isNotEmpty) {
-      var long = this.results.first.coordinates.latitude;
-      return Text(long.toString());
+      // var long = this.results.first.coordinates.latitude;
+      //return Text(long.toString());
     } else {
       return Text('bald');
     }
@@ -59,8 +61,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
 
   search() async {
     try {
-      results =
-          await Geocoder.local.findAddressesFromQuery(textController1.text);
+      //results =
+      //await Geocoder.local.findAddressesFromQuery(textController1.text);
       this.setState(() {
         this.results = results;
       });
@@ -379,7 +381,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         FFButtonWidget(
-                          onPressed: () async {
+                          onPressed: () => {},
+                          /*async {
                             setState(() => _loadingButton4 = true);
                             try {
                               await Navigator.push(
@@ -394,7 +397,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                             } finally {
                               setState(() => _loadingButton4 = false);
                             }
-                          },
+                          }*/
                           text: 'Cancel',
                           options: FFButtonOptions(
                             width: 130,
