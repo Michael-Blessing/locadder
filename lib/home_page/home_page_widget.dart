@@ -10,11 +10,10 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:locadder/Video.dart';
-//import 'package:geocoder/geocoder.dart';
-//import 'package:geocoder/services/base.dart';
 
 class HomePageWidget extends StatefulWidget {
-  HomePageWidget(CameraDescription firstCamera, {Key key}) : super(key: key);
+  final CameraDescription firstCamera;
+  HomePageWidget(this.firstCamera, {Key key}) : super(key: key);
 
   @override
   _HomePageWidgetState createState() => _HomePageWidgetState();
@@ -32,7 +31,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
   bool _loadingButton5 = false;
   final formKey = GlobalKey<FormState>();
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  List<Address> results = [];
+  Coordinates coordinates;
+  GeoCode geoCode = GeoCode();
 
   @override
   void initState() {
@@ -42,18 +42,18 @@ class _HomePageWidgetState extends State<HomePageWidget> {
   }
 
   Widget getLong() {
-    if (this.results.isNotEmpty) {
-      //var long = this.results.first.coordinates.longitude;
-      //return Text(long.toString());
+    if (this.coordinates != null) {
+      var long = this.coordinates.longitude;
+      return Text(long.toString());
     } else {
       return Text('bald');
     }
   }
 
   Widget getLat() {
-    if (this.results.isNotEmpty) {
-      // var long = this.results.first.coordinates.latitude;
-      //return Text(long.toString());
+    if (this.coordinates != null) {
+      var long = this.coordinates.latitude;
+      return Text(long.toString());
     } else {
       return Text('bald');
     }
@@ -61,10 +61,11 @@ class _HomePageWidgetState extends State<HomePageWidget> {
 
   search() async {
     try {
-      //results =
-      //await Geocoder.local.findAddressesFromQuery(textController1.text);
+      Coordinates results = await geoCode.forwardGeocoding(
+          address: textController1.text.toString());
+      print(results);
       this.setState(() {
-        this.results = results;
+        this.coordinates = results;
       });
     } catch (e) {}
   }
@@ -176,7 +177,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
                         child: FFButtonWidget(
-                          onPressed: () => FirebaseFirestore.instance
+                          onPressed: /* () => FirebaseFirestore.instance
                               .collection('testing5')
                               .add(
                             {
@@ -184,13 +185,16 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                 DateTime.now(),
                               ),
                             },
-                          ),
-                          /* () {
+                          ),*/
+                              () {
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => takePhoto()));
-                          },*/
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TakePictureScreen(
+                                    Camera: widget.firstCamera),
+                              ),
+                            );
+                          },
                           text: '',
                           icon: Icon(
                             Icons.add_a_photo,
@@ -220,7 +224,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => takePhoto()));
+                                    builder: (context) => TakeAudioScreen()));
                           },*/
                               () {},
                           text: '',
@@ -252,7 +256,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => VideoApp()));
+                                    builder: (context) => VideoRecorderApp()));
                           },
                           text: '',
                           icon: FaIcon(
@@ -375,7 +379,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                     ],
                   ),
                   Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0, 300, 0, 10),
+                    padding: EdgeInsetsDirectional.fromSTEB(0, 200, 0, 10),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
