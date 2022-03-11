@@ -60,11 +60,12 @@ class _HomePageWidgetState extends State<HomePageWidget> {
   }
 
   search() async {
+    print(textController1.text);
     try {
-      Coordinates results = await geoCode.forwardGeocoding(
-          address: textController1.text.toString());
+      Coordinates results =
+          await geoCode.forwardGeocoding(address: textController1.text);
       print(results);
-      this.setState(() {
+      setState(() {
         this.coordinates = results;
       });
     } catch (e) {}
@@ -177,16 +178,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
                         child: FFButtonWidget(
-                          onPressed: /* () => FirebaseFirestore.instance
-                              .collection('testing5')
-                              .add(
-                            {
-                              'timestamp': Timestamp.fromDate(
-                                DateTime.now(),
-                              ),
-                            },
-                          ),*/
-                              () {
+                          onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -254,9 +246,11 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         child: FFButtonWidget(
                           onPressed: () {
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => VideoRecorderApp()));
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => VideoRecorderExample(),
+                              ),
+                            );
                           },
                           text: '',
                           icon: FaIcon(
@@ -359,7 +353,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         child: Padding(
                             padding:
                                 EdgeInsetsDirectional.fromSTEB(1, 10, 10, 10),
-                            child: getLat()),
+                            child: Text(this.coordinates.latitude.toString())),
                       ),
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(1, 0, 1, 0),
@@ -374,7 +368,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         child: Padding(
                             padding:
                                 EdgeInsetsDirectional.fromSTEB(1, 10, 20, 10),
-                            child: getLong()),
+                            child: Text(this.coordinates.longitude.toString())),
                       )
                     ],
                   ),
@@ -402,7 +396,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                               setState(() => _loadingButton4 = false);
                             }
                           }*/
-                          text: 'Cancel',
+                          text: 'Look at the posts',
                           options: FFButtonOptions(
                             width: 130,
                             height: 40,

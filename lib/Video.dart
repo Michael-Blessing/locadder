@@ -12,16 +12,14 @@ class Storage {
   final firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
 
-  Future<void> uploadFile(String filePath) async {
+  Future<void> uploadFile(String filePath, String fileName) async {
     File file = File(filePath);
 
     try {
       await firebase_storage.FirebaseStorage.instance
-          .ref('files/videos')
+          .ref('videos/$fileName')
           .putFile(file);
-    } on firebase_core.FirebaseException catch (e) {
-      print(e);
-    }
+    } on firebase_core.FirebaseException catch (e) {}
   }
 }
 
@@ -38,8 +36,6 @@ class _VideoRecorderExampleState extends State<VideoRecorderExample> {
 
   List<CameraDescription> cameras;
   int selectedCameraIdx;
-
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -63,9 +59,9 @@ class _VideoRecorderExampleState extends State<VideoRecorderExample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       appBar: AppBar(
-        title: const Text('Take a video'),
+        automaticallyImplyLeading: true,
+        title: const Text('Take a video', textAlign: TextAlign.center),
       ),
       body: Column(
         children: <Widget>[
@@ -195,9 +191,9 @@ class _VideoRecorderExampleState extends State<VideoRecorderExample> {
   String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
 
   Future<void> _onCameraSwitched(CameraDescription cameraDescription) async {
-    if (controller != null) {
+    /*if (controller != null) {
       await controller.dispose();
-    }
+    }*/
 
     controller = CameraController(cameraDescription, ResolutionPreset.high);
 
@@ -254,10 +250,8 @@ class _VideoRecorderExampleState extends State<VideoRecorderExample> {
   }
 
   void _onStopButtonPressed() {
-    final Storage storage = Storage();
     _stopVideoRecording().then((_) {
       if (mounted) setState(() {});
-      storage.uploadFile(videoPath);
       Fluttertoast.showToast(
           msg: 'Video recorded to $videoPath',
           toastLength: Toast.LENGTH_SHORT,
@@ -287,8 +281,7 @@ class _VideoRecorderExampleState extends State<VideoRecorderExample> {
     final Directory appDirectory = await getApplicationDocumentsDirectory();
     final String videoDirectory = '${appDirectory.path}/Videos';
     await Directory(videoDirectory).create(recursive: true);
-    final String currentTime = DateTime.now().millisecondsSinceEpoch.toString();
-    final String filePath = '$videoDirectory/${currentTime}.mp4';
+    final String filePath = '$videoDirectory/Video1.mp4';
 
     try {
       await controller.startVideoRecording();
@@ -301,15 +294,31 @@ class _VideoRecorderExampleState extends State<VideoRecorderExample> {
     return filePath;
   }
 
+  String getFileName(String string) {
+    String result = '';
+    int count = 0;
+    int len = string.length;
+    for (int i = 0; i < len; i++) {
+      if (string[i] == '/') {
+        count++;
+      }
+      if (count == 7) {
+        result += string[i];
+      }
+    }
+
+    return result;
+  }
+
   Future<void> _stopVideoRecording() async {
-    final Storage storage = Storage();
-    storage.uploadFile(videoPath);
     if (!controller.value.isRecordingVideo) {
       return null;
     }
 
     try {
-      await controller.stopVideoRecording();
+      XFile file = await controller.stopVideoRecording();
+      final Storage storage = Storage();
+      storage.uploadFile(file.path, getFileName(file.path));
     } on CameraException catch (e) {
       _showCameraException(e);
       return null;

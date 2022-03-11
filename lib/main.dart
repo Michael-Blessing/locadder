@@ -10,7 +10,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   final cameras = await availableCameras();
-  final firstCamera = cameras.first;
+  final firstCamera = cameras[1];
   runApp(
     MaterialApp(
       title: 'locadder',

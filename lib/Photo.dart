@@ -14,7 +14,7 @@ class Storage {
 
     try {
       await firebase_storage.FirebaseStorage.instance
-          .ref('uploads/')
+          .ref('uploads/$fileName')
           .putFile(file);
     } on firebase_core.FirebaseException catch (e) {}
   }
@@ -43,12 +43,17 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       ResolutionPreset.medium,
     );
 
-    _initializeControllerFuture = _controller.initialize();
+    _initializeControllerFuture = _controller.initialize().then((_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
+    });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
