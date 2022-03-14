@@ -1,5 +1,7 @@
 import 'package:camera_platform_interface/src/types/camera_description.dart';
 import 'package:geocode/geocode.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:locadder/Photo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -28,11 +30,14 @@ class _HomePageWidgetState extends State<HomePageWidget> {
   TextEditingController textController3;
   TextEditingController textController4;
   bool _loadingButton4 = false;
-  bool _loadingButton5 = false;
   final formKey = GlobalKey<FormState>();
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  Coordinates coordinates;
-  GeoCode geoCode = GeoCode();
+  Position currentPosition;
+  dynamic lat;
+  dynamic alt;
+  String currentAddress;
+  final Geolocator geolocator = Geolocator();
+  int countOfPosts = 0;
 
   @override
   void initState() {
@@ -41,412 +46,369 @@ class _HomePageWidgetState extends State<HomePageWidget> {
     textController2 = TextEditingController();
   }
 
-  Widget getLong() {
-    if (this.coordinates != null) {
-      var long = this.coordinates.longitude;
-      return Text(long.toString());
-    } else {
-      return Text('bald');
-    }
-  }
-
-  Widget getLat() {
-    if (this.coordinates != null) {
-      var long = this.coordinates.latitude;
-      return Text(long.toString());
-    } else {
-      return Text('bald');
-    }
-  }
-
-  search() async {
-    print(textController1.text);
+  getAddressFromLatLng() async {
     try {
-      Coordinates results =
-          await geoCode.forwardGeocoding(address: textController1.text);
-      print(results);
+      List<Placemark> p = await placemarkFromCoordinates(
+          currentPosition.latitude, currentPosition.longitude);
+      Placemark place = p[0];
+      print("${place.locality}, ${place.postalCode}, ${place.country}");
       setState(() {
-        this.coordinates = results;
+        currentAddress =
+            "${place.locality}, ${place.postalCode}, ${place.country}";
       });
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  getAdress() async {
+    Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+        .then((Position position) {
+      setState(() {
+        currentPosition = position;
+        lat = currentPosition.latitude;
+        alt = currentPosition.altitude;
+        textController1.text = currentAddress;
+      });
+      getAddressFromLatLng();
+    }).catchError((e) {
+      print(e);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: formKey,
-      autovalidateMode: AutovalidateMode.always,
-      child: Scaffold(
-        key: scaffoldKey,
-        appBar: AppBar(
-          backgroundColor: FlutterFlowTheme.primaryColor,
-          automaticallyImplyLeading: true,
-          title: Text(
-            'Location Adder',
-            style: GoogleFonts.getFont(
-              'Raleway',
-              color: Colors.white,
-            ),
+    return Scaffold(
+      key: scaffoldKey,
+      appBar: AppBar(
+        backgroundColor: FlutterFlowTheme.primaryColor,
+        title: Text(
+          'Location Adder',
+          style: GoogleFonts.getFont(
+            'Raleway',
+            color: Colors.white,
           ),
-          actions: [],
-          centerTitle: true,
-          elevation: 4,
         ),
-        backgroundColor: Color(0xFFF5F5F5),
-        body: SafeArea(
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 1,
-            decoration: BoxDecoration(
-              color: Color(0xFFEEEEEE),
-            ),
-            child: Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 40),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(10, 10, 10, 0),
-                    child: TextFormField(
-                      onChanged: (_) => setState(() {}),
-                      controller: textController1,
-                      obscureText: false,
-                      decoration: InputDecoration(
-                        hintText: 'Name of POI',
-                        hintStyle: GoogleFonts.getFont(
-                          'Raleway',
-                          fontSize: 14,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Color(0xFF9E9E9E),
-                            width: 1,
-                          ),
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(4.0),
-                            topRight: Radius.circular(4.0),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Color(0xFF9E9E9E),
-                            width: 1,
-                          ),
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(4.0),
-                            topRight: Radius.circular(4.0),
-                          ),
-                        ),
-                        filled: true,
-                        fillColor: Color(0xFFEFEFEF),
-                        suffixIcon: textController1.text.isNotEmpty
-                            ? InkWell(
-                                onTap: () => setState(
-                                  () => textController1.clear(),
-                                ),
-                                child: Icon(
-                                  Icons.clear,
-                                  color: Color(0xFF757575),
-                                  size: 22,
-                                ),
-                              )
-                            : null,
-                      ),
-                      style: GoogleFonts.getFont(
+        actions: [],
+        centerTitle: true,
+        elevation: 4,
+      ),
+      backgroundColor: Color(0xFFF5F5F5),
+      body: SafeArea(
+        child: Container(
+          clipBehavior: Clip.none,
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * 1,
+          decoration: BoxDecoration(
+            color: Color(0xFFEEEEEE),
+          ),
+          child: Padding(
+            padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 40),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
+                  child: TextFormField(
+                    controller: textController1,
+                    decoration: InputDecoration(
+                      hintText: 'Click on the Button to get your Location',
+                      hintStyle: GoogleFonts.getFont(
                         'Raleway',
                         fontSize: 14,
                       ),
-                      textAlign: TextAlign.start,
-                      validator: (val) {
-                        if (val.isEmpty) {
-                          return 'You need to set a name to the Location!';
-                        }
-                        if (val.length < 3) {
-                          return 'You can\'t write  than 3 characters!';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
-                        child: FFButtonWidget(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TakePictureScreen(
-                                    Camera: widget.firstCamera),
-                              ),
-                            );
-                          },
-                          text: '',
-                          icon: Icon(
-                            Icons.add_a_photo,
-                            size: 14,
-                          ),
-                          options: FFButtonOptions(
-                            width: 50,
-                            height: 50,
-                            color: Color(0xFFDC0C0C),
-                            textStyle: FlutterFlowTheme.subtitle2.override(
-                              fontFamily: 'Poppins',
-                              color: Colors.white,
-                            ),
-                            borderSide: BorderSide(
-                              color: Colors.transparent,
-                              width: 1,
-                            ),
-                            borderRadius: 100,
-                          ),
-                          loading: _loadingButton1,
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color(0xFF9E9E9E),
+                          width: 1,
+                        ),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(4.0),
+                          topRight: Radius.circular(4.0),
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
-                        child: FFButtonWidget(
-                          onPressed: /*() {
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color(0xFF9E9E9E),
+                          width: 1,
+                        ),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(4.0),
+                          topRight: Radius.circular(4.0),
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: Color(0xFFEFEFEF),
+                    ),
+                    style: GoogleFonts.getFont(
+                      'Raleway',
+                      fontSize: 14,
+                    ),
+                    textAlign: TextAlign.start,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(70, 10, 10, 10),
+                  child: FFButtonWidget(
+                    onPressed: () => getAdress(),
+                    text: 'Get Current Position',
+                    icon: FaIcon(
+                      FontAwesomeIcons.locationArrow,
+                      size: 16,
+                    ),
+                    options: FFButtonOptions(
+                      width: 250,
+                      height: 50,
+                      color: Color(0xFF0305FE),
+                      textStyle: FlutterFlowTheme.subtitle2.override(
+                        fontFamily: 'Poppins',
+                        color: Colors.white,
+                      ),
+                      borderSide: BorderSide(
+                        color: Colors.transparent,
+                        width: 1,
+                      ),
+                      borderRadius: 100,
+                    ),
+                    loading: _loadingButton4,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
+                  child: TextFormField(
+                    controller: textController2,
+                    obscureText: false,
+                    decoration: InputDecoration(
+                      hintText: 'Description of Place',
+                      hintStyle: GoogleFonts.getFont(
+                        'Raleway',
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color(0xFF9E9E9E),
+                          width: 1,
+                        ),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(4.0),
+                          topRight: Radius.circular(4.0),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color(0xFF9E9E9E),
+                          width: 1,
+                        ),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(4.0),
+                          topRight: Radius.circular(4.0),
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: Color(0xFFEFEFEF),
+                    ),
+                    style: GoogleFonts.getFont(
+                      'Raleway',
+                    ),
+                  ),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(20, 0, 1, 0),
+                      child: Text(
+                        'Latitude',
+                        style: FlutterFlowTheme.bodyText1.override(
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                          padding:
+                              EdgeInsetsDirectional.fromSTEB(1, 10, 10, 10),
+                          child: lat != null ? Text(lat.toString()) : Text('')),
+                    ),
+                    Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(1, 0, 1, 0),
+                      child: Text(
+                        'Altitude',
+                        style: FlutterFlowTheme.bodyText1.override(
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                          padding:
+                              EdgeInsetsDirectional.fromSTEB(1, 10, 20, 10),
+                          child: alt != null ? Text(alt.toString()) : Text('')),
+                    )
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
+                      child: FFButtonWidget(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  TakePictureScreen(Camera: widget.firstCamera),
+                            ),
+                          );
+                        },
+                        text: '',
+                        icon: Icon(
+                          Icons.add_a_photo,
+                          size: 14,
+                        ),
+                        options: FFButtonOptions(
+                          width: 50,
+                          height: 50,
+                          color: Color(0xFFDC0C0C),
+                          textStyle: FlutterFlowTheme.subtitle2.override(
+                            fontFamily: 'Poppins',
+                            color: Colors.white,
+                          ),
+                          borderSide: BorderSide(
+                            color: Colors.transparent,
+                            width: 1,
+                          ),
+                          borderRadius: 100,
+                        ),
+                        loading: _loadingButton1,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
+                      child: FFButtonWidget(
+                        onPressed: () => getAdress(),
+                        /*() {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => TakeAudioScreen()));
                           },*/
-                              () {},
-                          text: '',
-                          icon: FaIcon(
-                            FontAwesomeIcons.microphone,
-                            size: 16,
-                          ),
-                          options: FFButtonOptions(
-                            width: 50,
-                            height: 50,
-                            color: Color(0xFFDC0C0C),
-                            textStyle: FlutterFlowTheme.subtitle2.override(
-                              fontFamily: 'Poppins',
-                              color: Colors.white,
-                            ),
-                            borderSide: BorderSide(
-                              color: Colors.transparent,
-                              width: 1,
-                            ),
-                            borderRadius: 100,
-                          ),
-                          loading: _loadingButton2,
+                        //() {},
+                        text: '',
+                        icon: FaIcon(
+                          FontAwesomeIcons.microphone,
+                          size: 16,
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
-                        child: FFButtonWidget(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => VideoRecorderExample(),
-                              ),
-                            );
-                          },
-                          text: '',
-                          icon: FaIcon(
-                            FontAwesomeIcons.video,
-                            size: 12,
+                        options: FFButtonOptions(
+                          width: 50,
+                          height: 50,
+                          color: Color(0xFFDC0C0C),
+                          textStyle: FlutterFlowTheme.subtitle2.override(
+                            fontFamily: 'Poppins',
+                            color: Colors.white,
                           ),
-                          options: FFButtonOptions(
-                            width: 50,
-                            height: 50,
-                            color: Color(0xFFDC0C0C),
-                            textStyle: FlutterFlowTheme.subtitle2.override(
-                              fontFamily: 'Poppins',
-                              color: Colors.white,
-                            ),
-                            borderSide: BorderSide(
-                              color: Colors.transparent,
-                              width: 1,
-                            ),
-                            borderRadius: 100,
-                          ),
-                          loading: _loadingButton3,
-                        ),
-                      )
-                    ],
-                  ),
-                  Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(10, 5, 10, 0),
-                    child: TextFormField(
-                      controller: textController2,
-                      obscureText: false,
-                      decoration: InputDecoration(
-                        hintText: 'Description of Place',
-                        hintStyle: GoogleFonts.getFont(
-                          'Raleway',
-                        ),
-                        enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            color: Color(0xFF9E9E9E),
+                            color: Colors.transparent,
                             width: 1,
                           ),
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(4.0),
-                            topRight: Radius.circular(4.0),
-                          ),
+                          borderRadius: 100,
                         ),
-                        focusedBorder: OutlineInputBorder(
+                        loading: _loadingButton2,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
+                      child: FFButtonWidget(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => VideoRecorderExample(),
+                            ),
+                          );
+                        },
+                        text: '',
+                        icon: FaIcon(
+                          FontAwesomeIcons.video,
+                          size: 12,
+                        ),
+                        options: FFButtonOptions(
+                          width: 50,
+                          height: 50,
+                          color: Color(0xFFDC0C0C),
+                          textStyle: FlutterFlowTheme.subtitle2.override(
+                            fontFamily: 'Poppins',
+                            color: Colors.white,
+                          ),
                           borderSide: BorderSide(
-                            color: Color(0xFF9E9E9E),
+                            color: Colors.transparent,
                             width: 1,
                           ),
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(4.0),
-                            topRight: Radius.circular(4.0),
-                          ),
+                          borderRadius: 100,
                         ),
-                        filled: true,
-                        fillColor: Color(0xFFEFEFEF),
+                        loading: _loadingButton3,
                       ),
-                      style: GoogleFonts.getFont(
-                        'Raleway',
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(10, 5, 10, 0),
-                    child: FFButtonWidget(
-                      onPressed: () => search(),
-                      text: 'Search',
-                      options: FFButtonOptions(
-                        width: 130,
-                        height: 40,
-                        color: Color(0xFF0305FE),
-                        textStyle: GoogleFonts.getFont(
-                          'Raleway',
-                          color: Colors.white,
-                          fontStyle: FontStyle.normal,
-                        ),
-                        borderSide: BorderSide(
-                          color: Colors.transparent,
-                          width: 1,
-                        ),
-                        borderRadius: 12,
-                      ),
-                      loading: _loadingButton4,
-                    ),
-                  ),
-                  Row(
+                    )
+                  ],
+                ),
+                Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(0, 200, 0, 10),
+                  child: Row(
                     mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(20, 0, 1, 0),
-                        child: Text(
-                          'Lat',
-                          style: FlutterFlowTheme.bodyText1.override(
-                            fontFamily: 'Poppins',
+                      FFButtonWidget(
+                        onPressed: () => {},
+                        text: 'Look at the posts',
+                        options: FFButtonOptions(
+                          width: 130,
+                          height: 40,
+                          color: Color(0xFF0305FE),
+                          textStyle: GoogleFonts.getFont(
+                            'Raleway',
+                            color: Colors.white,
+                            fontStyle: FontStyle.normal,
                           ),
+                          borderSide: BorderSide(
+                            color: Colors.transparent,
+                            width: 1,
+                          ),
+                          borderRadius: 12,
+                        ),
+                        loading: _loadingButton4,
+                      ),
+                      FFButtonWidget(
+                        onPressed: () {
+                          setState(() {
+                            countOfPosts = countOfPosts + 1;
+                            print(countOfPosts);
+                          });
+                        },
+                        text: 'Create',
+                        options: FFButtonOptions(
+                          width: 130,
+                          height: 40,
+                          color: Color(0xFF0305FE),
+                          textStyle: GoogleFonts.getFont(
+                            'Raleway',
+                            color: Colors.white,
+                            fontStyle: FontStyle.normal,
+                          ),
+                          borderSide: BorderSide(
+                            color: Colors.transparent,
+                            width: 1,
+                          ),
+                          borderRadius: 12,
                         ),
                       ),
-                      Expanded(
-                        child: Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(1, 10, 10, 10),
-                            child: Text(this.coordinates.latitude.toString())),
-                      ),
-                      Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(1, 0, 1, 0),
-                        child: Text(
-                          'Long',
-                          style: FlutterFlowTheme.bodyText1.override(
-                            fontFamily: 'Poppins',
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(1, 10, 20, 10),
-                            child: Text(this.coordinates.longitude.toString())),
-                      )
                     ],
                   ),
-                  Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0, 200, 0, 10),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        FFButtonWidget(
-                          onPressed: () => {},
-                          /*async {
-                            setState(() => _loadingButton4 = true);
-                            try {
-                              await Navigator.push(
-                                context,
-                                PageTransition(
-                                  type: PageTransitionType.topToBottom,
-                                  duration: Duration(milliseconds: 300),
-                                  reverseDuration: Duration(milliseconds: 300),
-                                  child: HomePageWidget(),
-                                ),
-                              );
-                            } finally {
-                              setState(() => _loadingButton4 = false);
-                            }
-                          }*/
-                          text: 'Look at the posts',
-                          options: FFButtonOptions(
-                            width: 130,
-                            height: 40,
-                            color: Color(0xFF0305FE),
-                            textStyle: GoogleFonts.getFont(
-                              'Raleway',
-                              color: Colors.white,
-                              fontStyle: FontStyle.normal,
-                            ),
-                            borderSide: BorderSide(
-                              color: Colors.transparent,
-                              width: 1,
-                            ),
-                            borderRadius: 12,
-                          ),
-                          loading: _loadingButton4,
-                        ),
-                        FFButtonWidget(
-                          onPressed: () => FirebaseFirestore.instance
-                              .collection('Locations')
-                              .add(
-                            {
-                              'timestamp': Timestamp.fromDate(
-                                DateTime.now(),
-                              ),
-                            },
-                          ),
-                          text: 'Create',
-                          options: FFButtonOptions(
-                            width: 130,
-                            height: 40,
-                            color: Color(0xFF0305FE),
-                            textStyle: GoogleFonts.getFont(
-                              'Raleway',
-                              color: Colors.white,
-                              fontStyle: FontStyle.normal,
-                            ),
-                            borderSide: BorderSide(
-                              color: Colors.transparent,
-                              width: 1,
-                            ),
-                            borderRadius: 12,
-                          ),
-                          loading: _loadingButton5,
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
+                )
+              ],
             ),
           ),
         ),
