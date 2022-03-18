@@ -2,9 +2,15 @@
     package="com.flutterflow.locadder"
     xmlns:tools="http://schemas.android.com/tools">
    <uses-permission android:name="android.permission.INTERNET"/>
+<<<<<<< HEAD
+   <uses-permission android:name="android.permission.RECORD_Audio"/>
+   <uses-permission android:namme="android.permission.WRITE_EXTERNAL_STORAGE"/>
+  
+=======
    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />  
+>>>>>>> 30e70896553931b76d47fc1fdc2d2fe6fbf6cee2
    <application
         android:label="locadder"
         tools:replace="android:label"
