@@ -9,8 +9,8 @@ import 'flutter_flow/flutter_flow_theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  List<CameraDescription> cameras = await availableCameras();
-  CameraDescription firstCamera = cameras.first;
+  final cameras = await availableCameras();
+  final firstCamera = cameras[0];
   runApp(
     MaterialApp(
       title: 'locadder',
