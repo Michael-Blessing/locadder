@@ -14,9 +14,15 @@ class Storage {
 
     try {
       await firebase_storage.FirebaseStorage.instance
-          .ref('uploads/$fileName')
+          .ref('uploads/$fileName.jpg')
           .putFile(file);
     } on firebase_core.FirebaseException catch (e) {}
+  }
+
+  Future<int> fetchNumberOfPosts() async {
+    final listRef = firebase_storage.FirebaseStorage.instance.ref('uploads/');
+    final allResults = await listRef.listAll();
+    return allResults.items.length;
   }
 }
 
@@ -77,7 +83,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
           try {
             await _initializeControllerFuture;
             final image = await _controller.takePicture();
-            storage.uploadFile(image.path, image.name);
+            int number = await storage.fetchNumberOfPosts();
+            storage.uploadFile(image.path, '$number.jpg');
             await Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => DisplayPictureScreen(

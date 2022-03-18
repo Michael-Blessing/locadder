@@ -17,9 +17,15 @@ class Storage {
 
     try {
       await firebase_storage.FirebaseStorage.instance
-          .ref('videos/$fileName')
+          .ref('uploads/$fileName.mp4')
           .putFile(file);
     } on firebase_core.FirebaseException catch (e) {}
+  }
+
+  Future<int> fetchNumberOfPosts() async {
+    final listRef = firebase_storage.FirebaseStorage.instance.ref('text/');
+    final allResults = await listRef.listAll();
+    return allResults.items.length;
   }
 }
 
@@ -294,22 +300,6 @@ class _VideoRecorderExampleState extends State<VideoRecorderExample> {
     return filePath;
   }
 
-  String getFileName(String string) {
-    String result = '';
-    int count = 0;
-    int len = string.length;
-    for (int i = 0; i < len; i++) {
-      if (string[i] == '/') {
-        count++;
-      }
-      if (count == 7) {
-        result += string[i];
-      }
-    }
-
-    return result;
-  }
-
   Future<void> _stopVideoRecording() async {
     if (!controller.value.isRecordingVideo) {
       return null;
@@ -318,7 +308,8 @@ class _VideoRecorderExampleState extends State<VideoRecorderExample> {
     try {
       XFile file = await controller.stopVideoRecording();
       final Storage storage = Storage();
-      storage.uploadFile(file.path, getFileName(file.path));
+      int number = await storage.fetchNumberOfPosts();
+      storage.uploadFile(file.path, '$number.mp4');
     } on CameraException catch (e) {
       _showCameraException(e);
       return null;

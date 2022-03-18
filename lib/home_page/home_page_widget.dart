@@ -3,8 +3,8 @@ import 'package:geocode/geocode.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:locadder/Photo.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import '../flutter_flow/flutter_flow_theme.dart';
 import '../flutter_flow/flutter_flow_util.dart';
 import '../flutter_flow/flutter_flow_widgets.dart';
@@ -12,6 +12,41 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:locadder/Video.dart';
+import 'dart:convert' show utf8;
+import 'dart:typed_data' show Uint8List;
+
+class Storage {
+  final firebase_storage.FirebaseStorage storage =
+      firebase_storage.FirebaseStorage.instance;
+
+  Future<void> uploadText(String text, int postNumber, String type) async {
+    List<int> encoded = utf8.encode(text);
+    Uint8List data = Uint8List.fromList(encoded);
+
+    try {
+      await firebase_storage.FirebaseStorage.instance
+          .ref('uploads/$type$postNumber.txt')
+          .putData(data);
+    } on firebase_core.FirebaseException catch (e) {}
+  }
+
+  Future<void> uploadText1(String text, int postNumber) async {
+    List<int> encoded = utf8.encode(text);
+    Uint8List data = Uint8List.fromList(encoded);
+
+    try {
+      await firebase_storage.FirebaseStorage.instance
+          .ref('text/$postNumber.txt')
+          .putData(data);
+    } on firebase_core.FirebaseException catch (e) {}
+  }
+
+  Future<int> fetchNumberOfPosts() async {
+    final listRef = firebase_storage.FirebaseStorage.instance.ref('text/');
+    final allResults = await listRef.listAll();
+    return allResults.items.length;
+  }
+}
 
 class HomePageWidget extends StatefulWidget {
   final CameraDescription firstCamera;
@@ -38,10 +73,16 @@ class _HomePageWidgetState extends State<HomePageWidget> {
   String currentAddress;
   final Geolocator geolocator = Geolocator();
   int countOfPosts = 0;
+  final Storage storage = Storage();
 
   @override
   void initState() {
     super.initState();
+    storage.fetchNumberOfPosts().then((result) {
+      setState(() {
+        countOfPosts = result;
+      });
+    });
     textController1 = TextEditingController();
     textController2 = TextEditingController();
   }
@@ -74,6 +115,16 @@ class _HomePageWidgetState extends State<HomePageWidget> {
     }).catchError((e) {
       print(e);
     });
+  }
+
+  uploadTextFrom() {
+    String text1 = textController1.text;
+    storage.uploadText(text1, countOfPosts, 'Addresse');
+    String text2 = textController2.text;
+    storage.uploadText(text2, countOfPosts, 'Addresse');
+    storage.uploadText1(text2, countOfPosts);
+    textController2.text = '';
+    textController1.text = '';
   }
 
   @override
@@ -290,14 +341,13 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                     Padding(
                       padding: EdgeInsetsDirectional.fromSTEB(5, 10, 0, 0),
                       child: FFButtonWidget(
-                        onPressed: () => getAdress(),
-                        /*() {
+                        onPressed: () {},
+                        /*onPressed: () {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => TakeAudioScreen()));
                           },*/
-                        //() {},
                         text: '',
                         icon: FaIcon(
                           FontAwesomeIcons.microphone,
@@ -364,8 +414,12 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       FFButtonWidget(
                         onPressed: () => {},
                         text: 'Look at the posts',
+                        icon: FaIcon(
+                          FontAwesomeIcons.eye,
+                          size: 16,
+                        ),
                         options: FFButtonOptions(
-                          width: 130,
+                          width: 170,
                           height: 40,
                           color: Color(0xFF0305FE),
                           textStyle: GoogleFonts.getFont(
@@ -384,13 +438,17 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       FFButtonWidget(
                         onPressed: () {
                           setState(() {
+                            uploadTextFrom();
                             countOfPosts = countOfPosts + 1;
-                            print(countOfPosts);
                           });
                         },
                         text: 'Create',
+                        icon: FaIcon(
+                          FontAwesomeIcons.award,
+                          size: 16,
+                        ),
                         options: FFButtonOptions(
-                          width: 130,
+                          width: 170,
                           height: 40,
                           color: Color(0xFF0305FE),
                           textStyle: GoogleFonts.getFont(
