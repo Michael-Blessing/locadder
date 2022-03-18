@@ -1,173 +1,269 @@
+/*
+ * Copyright 2018, 2019, 2020, 2021 Dooboolab.
+ *
+ * This file is part of Flutter-Sound.
+ *
+ * Flutter-Sound is free software: you can redistribute it and/or modify
+ * it under the terms of the Mozilla Public License version 2 (MPL2.0),
+ * as published by the Mozilla organization.
+ *
+ * Flutter-Sound is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MPL General Public License for more details.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
 
+import 'dart:async';
+import 'package:audio_session/audio_session.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:timeago/timeago.dart';
-import '../flutter_flow/flutter_flow_icon_button.dart';
-import '../flutter_flow/flutter_flow_theme.dart';
-import '../flutter_flow/flutter_flow_util.dart';
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_sound_platform_interface/flutter_sound_recorder_platform_interface.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-class AudioWidget extends StatefulWidget {
-  AudioWidget({Key key}) : super(key: key);
+/*
+ * This is an example showing how to record to a Dart Stream.
+ * It writes all the recorded data from a Stream to a File, which is completely stupid:
+ * if an App wants to record something to a File, it must not use Streams.
+ *
+ * The real interest of recording to a Stream is for example to feed a
+ * Speech-to-Text engine, or for processing the Live data in Dart in real time.
+ *
+ */
 
+///
+typedef _Fn = void Function();
+
+/* This does not work. on Android we must have the Manifest.permission.CAPTURE_AUDIO_OUTPUT permission.
+ * But this permission is _is reserved for use by system components and is not available to third-party applications._
+ * Pleaser look to [this](https://developer.android.com/reference/android/media/MediaRecorder.AudioSource#VOICE_UPLINK)
+ *
+ * I think that the problem is because it is illegal to record a communication in many countries.
+ * Probably this stands also on iOS.
+ * Actually I am unable to record DOWNLINK on my Xiaomi Chinese phone.
+ *
+ */
+//const theSource = AudioSource.voiceUpLink;
+//const theSource = AudioSource.voiceDownlink;
+
+const theSource = AudioSource.microphone;
+
+/// Example app.
+class SimpleRecorder extends StatefulWidget {
   @override
-  _AudioWidgetState createState() => _AudioWidgetState();
+  _SimpleRecorderState createState() => _SimpleRecorderState();
 }
 
-class _AudioWidgetState extends State<AudioWidget> {
-  FlutterSound flutterSound = new FlutterSound();
-  final scaffoldKey = GlobalKey<ScaffoldState>();
+class _SimpleRecorderState extends State<SimpleRecorder> {
+  Codec _codec = Codec.aacMP4;
+  String _mPath = 'tau_file.mp4';
+  FlutterSoundPlayer _mPlayer = FlutterSoundPlayer();
+  FlutterSoundRecorder _mRecorder = FlutterSoundRecorder();
+  bool _mPlayerIsInited = false;
+  bool _mRecorderIsInited = false;
+  bool _mplaybackReady = false;
+
+  @override
+  void initState() {
+    _mPlayer.openPlayer().then((value) {
+      setState(() {
+        _mPlayerIsInited = true;
+      });
+    });
+
+    openTheRecorder().then((value) {
+      setState(() {
+        _mRecorderIsInited = true;
+      });
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _mPlayer.closePlayer();
+    _mPlayer = null;
+
+    _mRecorder.closeRecorder();
+    _mRecorder = null;
+    super.dispose();
+  }
+
+  Future<void> openTheRecorder() async {
+    if (!kIsWeb) {
+      var status = await Permission.microphone.request();
+      if (status != PermissionStatus.granted) {
+        throw RecordingPermissionException('Microphone permission not granted');
+      }
+    }
+    await _mRecorder.openRecorder();
+    if (!await _mRecorder.isEncoderSupported(_codec) && kIsWeb) {
+      _codec = Codec.opusWebM;
+      _mPath = 'tau_file.webm';
+      if (!await _mRecorder.isEncoderSupported(_codec) && kIsWeb) {
+        _mRecorderIsInited = true;
+        return;
+      }
+    }
+    final session = await AudioSession.instance;
+    await session.configure(AudioSessionConfiguration(
+      avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
+      avAudioSessionCategoryOptions:
+          AVAudioSessionCategoryOptions.allowBluetooth |
+              AVAudioSessionCategoryOptions.defaultToSpeaker,
+      avAudioSessionMode: AVAudioSessionMode.spokenAudio,
+      avAudioSessionRouteSharingPolicy:
+          AVAudioSessionRouteSharingPolicy.defaultPolicy,
+      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+      androidAudioAttributes: const AndroidAudioAttributes(
+        contentType: AndroidAudioContentType.speech,
+        flags: AndroidAudioFlags.none,
+        usage: AndroidAudioUsage.voiceCommunication,
+      ),
+      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+      androidWillPauseWhenDucked: true,
+    ));
+
+    _mRecorderIsInited = true;
+  }
+
+  // ----------------------  Here is the code for recording and playback -------
+
+  void record() {
+    _mRecorder
+        .startRecorder(
+      toFile: _mPath,
+      codec: _codec,
+      audioSource: theSource,
+    )
+        .then((value) {
+      setState(() {});
+    });
+  }
+
+  void stopRecorder() async {
+    await _mRecorder.stopRecorder().then((value) {
+      setState(() {
+        //var url = value;
+        _mplaybackReady = true;
+      });
+    });
+  }
+
+  void play() {
+    assert(_mPlayerIsInited &&
+        _mplaybackReady &&
+        _mRecorder.isStopped &&
+        _mPlayer.isStopped);
+    _mPlayer
+        .startPlayer(
+            fromURI: _mPath,
+            //codec: kIsWeb ? Codec.opusWebM : Codec.aacADTS,
+            whenFinished: () {
+              setState(() {});
+            })
+        .then((value) {
+      setState(() {});
+    });
+  }
+
+  void stopPlayer() {
+    _mPlayer.stopPlayer().then((value) {
+      setState(() {});
+    });
+  }
+
+// ----------------------------- UI --------------------------------------------
+
+  _Fn getRecorderFn() {
+    if (!_mRecorderIsInited || !_mPlayer.isStopped) {
+      return null;
+    }
+    return _mRecorder.isStopped ? record : stopRecorder;
+  }
+
+  _Fn getPlaybackFn() {
+    if (!_mPlayerIsInited || !_mplaybackReady || !_mRecorder.isStopped) {
+      return null;
+    }
+    return _mPlayer.isStopped ? play : stopPlayer;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: scaffoldKey,
-      backgroundColor: Color(0xFFF5F5F5),
-      body: SafeArea(
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height * 1,
-          decoration: BoxDecoration(
-            color: Color(0xFFEEEEEE),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Container(
-                width: 120,
-                height: 120,
-                clipBehavior: Clip.antiAlias,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
-                child: Image.network(
-                  'data:image/png;base64,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',
-                ),
+    Widget makeBody() {
+      return Column(
+        children: [
+          Container(
+            margin: const EdgeInsets.all(3),
+            padding: const EdgeInsets.all(3),
+            height: 80,
+            width: double.infinity,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Color(0xFFFAF0E6),
+              border: Border.all(
+                color: Colors.indigo,
+                width: 3,
               ),
-              Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0, 160, 0, 0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(0, 0, 10, 10),
-                          child: FlutterFlowIconButton(
-                            borderColor: Colors.black,
-                            borderRadius: 30,
-                            borderWidth: 1,
-                            buttonSize: 60,
-                            fillColor: Colors.transparent,
-                            icon: FaIcon(
-                              FontAwesomeIcons.play,
-                              color: Colors.black,
-                              size: 30,
-                            ),
-                            onPressed: () {
-                              String path = await flutterSound.startPlayer(null);
-                              print('startPlayer: $path');
-
-                              _playerSubscription = flutterSound.onPlayerStateChanged.listen((e) {
-                                if (e != null) {
-                                  DateTime date = new DateTime.fromMillisecondsSinceEpoch(e.currentPosition.toInt());
-                                  String txt = DateFormat('mm:ss:SS', 'en_US').format(date);
-                                  this.setState((){
-                                    this._isPlaying = true;
-                                    this._playerTxt = txt.substring(0, 8);
-                                  });
-                                }
-                              });
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(0, 10, 10, 0),
-                          child: FlutterFlowIconButton(
-                            borderColor: Colors.black,
-                            borderRadius: 30,
-                            borderWidth: 1,
-                            buttonSize: 60,
-                            icon: FaIcon(
-                              FontAwesomeIcons.pause,
-                              color: Colors.black,
-                              size: 30,
-                            ),
-                            onPressed: () {
-                              print('IconButton pressed ...');
-                            },
-                          ),
-                        )
-                      ],
-                    ),
-                    Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(10, 0, 0, 10),
-                          child: FlutterFlowIconButton(
-                            borderColor: Colors.black,
-                            borderRadius: 30,
-                            borderWidth: 1,
-                            buttonSize: 60,
-                            icon: FaIcon(
-                              FontAwesomeIcons.microphone,
-                              color: Colors.black,
-                              size: 30,
-                            ),
-                            onPressed: () {
-                              String path = await flutterSound.startRecorder(null);
-                              print('startPlayer: $path');
-                              _recorderSubscription = flutterSound.onRecorderStateChanged.listen((e) {
-                                if (e != null) {
-                                  DateTime date = new DateTime.fromMillisecondsSinceEpoch(e.currentPosition.toInt());
-                                  String txt = DateFormat('mm:ss:SS', 'en_US').format(date);
-                                  this.setState((){
-                                    this._isRecording = true;
-                                    this._recorderTxt = txt.substring(0, 8);
-                                  });
-                                }
-                              });
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0),
-                          child: FlutterFlowIconButton(
-                            borderColor: Colors.black,
-                            borderRadius: 30,
-                            borderWidth: 1,
-                            buttonSize: 60,
-                            icon: FaIcon(
-                              FontAwesomeIcons.stop,
-                              color: Colors.black,
-                              size: 30,
-                            ),
-                            onPressed: () {
-                              String result = await flutterSound.stopRecorder();
-                              print('stopRecorder: $result');
-
-                              if (_recorderSubscription != null) {
-                                _recorderSubscription.cancel();
-                                _recorderSubscription = null:
-                              }
-                            },
-                          ),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              )
-            ],
+            ),
+            child: Row(children: [
+              ElevatedButton(
+                onPressed: getRecorderFn(),
+                //color: Colors.white,
+                //disabledColor: Colors.grey,
+                child: Text(_mRecorder.isRecording ? 'Stop' : 'Record'),
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              Text(_mRecorder.isRecording
+                  ? 'Recording in progress'
+                  : 'Recorder is stopped'),
+            ]),
           ),
-        ),
+          Container(
+            margin: const EdgeInsets.all(3),
+            padding: const EdgeInsets.all(3),
+            height: 80,
+            width: double.infinity,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Color(0xFFFAF0E6),
+              border: Border.all(
+                color: Colors.indigo,
+                width: 3,
+              ),
+            ),
+            child: Row(children: [
+              ElevatedButton(
+                onPressed: getPlaybackFn(),
+                //color: Colors.white,
+                //disabledColor: Colors.grey,
+                child: Text(_mPlayer.isPlaying ? 'Stop' : 'Play'),
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              Text(_mPlayer.isPlaying
+                  ? 'Playback in progress'
+                  : 'Player is stopped'),
+            ]),
+          ),
+        ],
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: Colors.blue,
+      appBar: AppBar(
+        title: const Text('Simple Recorder'),
       ),
+      body: makeBody(),
     );
   }
 }
