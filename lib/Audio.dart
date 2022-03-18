@@ -16,7 +16,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-
+/*
 import 'dart:async';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -267,3 +267,4 @@ class _SimpleRecorderState extends State<SimpleRecorder> {
     );
   }
 }
+*/

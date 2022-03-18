@@ -58,7 +58,7 @@ class PostPageState extends State<PostPage> {
                   itemBuilder: (BuildContext context, int index) {
                     return ListTile(
                       contentPadding: EdgeInsets.all(8.0),
-                      title: Text(snapshot.data.docs[index].data()[""]),
+                      title: Text(snapshot.data.docs[index].data()["uploads"]),
                       leading: Image.network(
                           snapshot.data.docs[index].data()["url"],
                           fit: BoxFit.fill),

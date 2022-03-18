@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:locadder/Photo.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
+import 'package:locadder/Posts.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
 import '../flutter_flow/flutter_flow_util.dart';
 import '../flutter_flow/flutter_flow_widgets.dart';
@@ -121,7 +122,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
     String text1 = textController1.text;
     storage.uploadText(text1, countOfPosts, 'Addresse');
     String text2 = textController2.text;
-    storage.uploadText(text2, countOfPosts, 'Addresse');
+    storage.uploadText(text2, countOfPosts, 'Text');
     storage.uploadText1(text2, countOfPosts);
     textController2.text = '';
     textController1.text = '';
@@ -412,7 +413,14 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       FFButtonWidget(
-                        onPressed: () => {},
+                        onPressed: () => {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PostPage(),
+                            ),
+                          ),
+                        },
                         text: 'Look at the posts',
                         icon: FaIcon(
                           FontAwesomeIcons.eye,
